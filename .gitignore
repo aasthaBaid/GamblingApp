@@ -205,3 +205,56 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.log
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+*.env
+
+# Database / Migrations / Dumps
+*.sqlite3
+*.db
+*.sql
+migrations/
+
+# Build / Packaging
+build/
+dist/
+*.tar.gz
+*.whl
+
+# Coverage / Testing
+.coverage
+htmlcov/
+.cache/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+
+# Jupyter / Notebooks
+.ipynb_checkpoints/
+
