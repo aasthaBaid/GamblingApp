@@ -23,9 +23,10 @@ class UserInterface:
         print("1. Create Gambler")
         print("2. Start Session")
         print("3. Place Bets")
-        print("4. End Session")
-        print("5. View Gambler Report")
-        print("6. Exit")
+        print("4. Pause/Resume Session")
+        print("5. End Session")
+        print("6. View Gambler Report")
+        print("7. Exit")
 
     def run(self):
         while True:
@@ -57,20 +58,37 @@ class UserInterface:
 
             elif choice == "3":
                 session_id = int(input("Enter session ID: "))
-                base_amount = Decimal(input("Bet amount: "))
-                num_bets = int(input("Number of bets: "))
-                probability = float(input("Win probability (0–1): "))
-                try:
-                    InputValidator.validate_probability(probability)
-                    self.bet_service.fixed_strategy(session_id, base_amount, num_bets, probability)
-                except ValidationException as e:
-                    print(f"Validation error: {e.message}")
+                # Check if session is ACTIVE
+                status = self.session_service.get_session_status(session_id)
+                if status != "ACTIVE":
+                    print(f"❌ Cannot place bets: session is {status}, not ACTIVE")
+                else:
+                    base_amount = Decimal(input("Bet amount: "))
+                    num_bets = int(input("Number of bets: "))
+                    probability = float(input("Win probability (0–1): "))
+                    try:
+                        InputValidator.validate_probability(probability)
+                        self.bet_service.fixed_strategy(session_id, base_amount, num_bets, probability)
+                    except ValidationException as e:
+                        print(f"Validation error: {e.message}")
 
             elif choice == "4":
                 session_id = int(input("Enter session ID: "))
-                self.session_service.end_session(session_id)
+                status = self.session_service.get_session_status(session_id)
+                if status is None:
+                    print(f"❌ Session {session_id} not found")
+                elif status == "ACTIVE":
+                    self.session_service.pause_session(session_id, "User action")
+                elif status == "PAUSED":
+                    self.session_service.resume_session(session_id)
+                else:
+                    print(f"❌ Cannot pause/resume: session is {status}")
 
             elif choice == "5":
+                session_id = int(input("Enter session ID: "))
+                self.session_service.end_session(session_id)
+
+            elif choice == "6":
                 gambler_id = int(input("Enter gambler ID: "))
                 report = self.report_service.gambler_report(gambler_id)
                 print("\n=== Gambler Report ===")
@@ -80,7 +98,7 @@ class UserInterface:
                           f"Wins: {s['total_wins']} | Losses: {s['total_losses']}")
                 print(f"Total Games: {report['total_games']} | Total Wins: {report['total_wins']} | Total Losses: {report['total_losses']}")
 
-            elif choice == "6":
+            elif choice == "7":
                 print("Exiting Gambling App. Goodbye.")
                 break
 
