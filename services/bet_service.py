@@ -40,7 +40,7 @@ class BetService:
                 amount=bet_amount
             )
 
-            print(f"✅ Bet {bet_id} created: {outcome}, new stake = {stake_after}")
+            print(f"Bet {bet_id} created: {outcome}, new stake = {stake_after}")
             return bet_id, outcome, stake_after
         except Error as e:
             print(f"Error creating bet: {e}")

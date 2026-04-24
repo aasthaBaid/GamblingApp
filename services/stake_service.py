@@ -18,7 +18,7 @@ class StakeService:
             # Ensure session exists
             cursor.execute("SELECT session_id FROM session WHERE session_id = %s", (session_id,))
             if cursor.fetchone() is None:
-                print(f"❌ Session {session_id} does not exist. Create session first.")
+                print(f"Session {session_id} does not exist. Create session first.")
                 return
 
             # Update gambler balance
@@ -36,7 +36,7 @@ class StakeService:
             self.session_peak[session_id] = amount
             self.session_low[session_id] = amount
 
-            print("✅ Stake initialized successfully")
+            print("Stake initialized successfully")
         except Error as e:
             print(f"Error initializing stake: {e}")
 
@@ -48,7 +48,7 @@ class StakeService:
             # Ensure session exists
             cursor.execute("SELECT session_id FROM session WHERE session_id = %s", (session_id,))
             if cursor.fetchone() is None:
-                print(f"❌ Session {session_id} does not exist. Create session first.")
+                print(f"Session {session_id} does not exist. Create session first.")
                 return
 
             # Get current balance
@@ -63,7 +63,7 @@ class StakeService:
             elif tx_type in ("RESET", "INITIAL_STAKE"):
                 new_balance = amount
             else:
-                print("❌ Invalid transaction type")
+                print("Invalid transaction type")
                 return
 
             # Update gambler balance
@@ -83,11 +83,11 @@ class StakeService:
 
             # Boundary validation
             if upper_limit and new_balance >= upper_limit:
-                print(f"⚠️ Upper limit reached! Balance = {new_balance}")
+                print(f"Upper limit reached! Balance = {new_balance}")
             if lower_limit and new_balance <= lower_limit:
-                print(f"⚠️ Lower limit reached! Balance = {new_balance}")
+                print(f"Lower limit reached! Balance = {new_balance}")
 
-            print(f"✅ Transaction recorded: {tx_type}, new balance = {new_balance}")
+            print(f"Transaction recorded: {tx_type}, new balance = {new_balance}")
             return new_balance
         except Error as e:
             print(f"Error recording transaction: {e}")

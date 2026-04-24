@@ -94,11 +94,92 @@
 
 # main.py
 
+# from services.gambler_service import GamblerService
+# from services.session_service import SessionService
+# from services.stake_service import StakeService
+# from services.bet_service import BetService
+# from services.winloss_service import WinLossService
+
+# def main():
+#     gambler_service = GamblerService()
+#     session_service = SessionService()
+#     stake_service = StakeService()
+#     bet_service = BetService()
+#     winloss_service = WinLossService()
+
+#     # --- UC1: Create gamblers ---
+#     alice_id = gambler_service.create_gambler("Alice", 1000, 100, 2000, 200)
+#     bob_id   = gambler_service.create_gambler("Bob", 1500, 200, 3000, 300)
+
+#     # --- UC4: Start sessions (assumes strategy_id=1 exists in DB) ---
+#     alice_session = session_service.start_session(alice_id, strategy_id=1,
+#                                                   initial_balance=1000,
+#                                                   upper_limit=2000,
+#                                                   lower_limit=200)
+#     bob_session   = session_service.start_session(bob_id, strategy_id=1,
+#                                                   initial_balance=1500,
+#                                                   upper_limit=3000,
+#                                                   lower_limit=300)
+
+#     # --- UC2: Initialize stake ---
+#     stake_service.initialize_stake(alice_id, alice_session, 1000, upper_limit=2000, lower_limit=200)
+#     stake_service.initialize_stake(bob_id, bob_session, 1500, upper_limit=3000, lower_limit=300)
+
+#     # --- UC3: Place bets with strategies ---
+#     bet_service.fixed_strategy(session_id=alice_session, base_amount=50, num_bets=3, probability=0.5)
+#     bet_service.martingale_strategy(session_id=bob_session, base_amount=20, num_bets=3, probability=0.5)
+
+#     # --- UC5: Calculate results ---
+#     winloss_service.update_session_results(alice_session)
+#     winloss_service.update_session_results(bob_session)
+
+#     print("Alice streaks:", winloss_service.track_streaks(alice_session))
+#     print("Bob streaks:", winloss_service.track_streaks(bob_session))
+
+#     # End sessions
+#     session_service.end_session(alice_session)
+#     session_service.end_session(bob_session)
+
+#     # Show summaries
+#     print("Alice summary:", session_service.get_session_summary(alice_session))
+#     print("Bob summary:", session_service.get_session_summary(bob_session))
+
+# if __name__ == "__main__":
+#     main()
+
+
+# from services.strategy_service import StrategyService
+
+# def main():
+#     strategy_service = StrategyService()
+
+#     # Create strategies
+#     # fixed_id = strategy_service.create_strategy("Fixed", "Always bet the same amount")
+#     # martingale_id = strategy_service.create_strategy("Martingale", "Double bet after each loss")
+#     # percentage_id = strategy_service.create_strategy("Percentage", "Bet a fixed percentage of current stake")
+
+#     # List strategies
+#     print("Available strategies:", strategy_service.list_strategies())
+
+#     # Get one strategy
+#     print("Martingale details:", strategy_service.get_strategy(strategy_id=3))
+
+#     # Update strategy
+#     # strategy_service.update_strategy(fixed_id, description="Bet a constant amount each round")
+
+# if __name__ == "__main__":
+#     main()
+
+
+# main.py
+
 from services.gambler_service import GamblerService
 from services.session_service import SessionService
 from services.stake_service import StakeService
 from services.bet_service import BetService
 from services.winloss_service import WinLossService
+from services.strategy_service import StrategyService
+from services.input_validator import InputValidator, ValidationException
 
 def main():
     gambler_service = GamblerService()
@@ -106,44 +187,51 @@ def main():
     stake_service = StakeService()
     bet_service = BetService()
     winloss_service = WinLossService()
+    strategy_service = StrategyService()
 
-    # --- UC1: Create gamblers ---
-    alice_id = gambler_service.create_gambler("Alice", 1000, 100, 2000, 200)
-    bob_id   = gambler_service.create_gambler("Bob", 1500, 200, 3000, 300)
+    try:
+        # --- UC6: Input Validation ---
+        InputValidator.validate_stake(1000)
+        InputValidator.validate_limits(initial_balance=1000, upper_limit=2000, lower_limit=200)
+        InputValidator.validate_probability(0.5)
 
-    # --- UC4: Start sessions (assumes strategy_id=1 exists in DB) ---
-    alice_session = session_service.start_session(alice_id, strategy_id=1,
-                                                  initial_balance=1000,
-                                                  upper_limit=2000,
-                                                  lower_limit=200)
-    bob_session   = session_service.start_session(bob_id, strategy_id=1,
-                                                  initial_balance=1500,
-                                                  upper_limit=3000,
-                                                  lower_limit=300)
+        # --- UC1: Create gamblers ---
+        alice_id = gambler_service.create_gambler("Alice", 1000, 100, 2000, 200)
+        bob_id   = gambler_service.create_gambler("Bob", 1500, 200, 3000, 300)
 
-    # --- UC2: Initialize stake ---
-    stake_service.initialize_stake(alice_id, alice_session, 1000, upper_limit=2000, lower_limit=200)
-    stake_service.initialize_stake(bob_id, bob_session, 1500, upper_limit=3000, lower_limit=300)
+        # --- UC6: Create strategies ---
+        fixed_id = strategy_service.create_strategy("Fixed", "Always bet the same amount")
+        martingale_id = strategy_service.create_strategy("Martingale", "Double bet after each loss")
 
-    # --- UC3: Place bets with strategies ---
-    bet_service.fixed_strategy(session_id=alice_session, base_amount=50, num_bets=3, probability=0.5)
-    bet_service.martingale_strategy(session_id=bob_session, base_amount=20, num_bets=3, probability=0.5)
+        # --- UC4: Start sessions ---
+        alice_session = session_service.start_session(alice_id, fixed_id, 1000, 2000, 200)
+        bob_session   = session_service.start_session(bob_id, martingale_id, 1500, 3000, 300)
 
-    # --- UC5: Calculate results ---
-    winloss_service.update_session_results(alice_session)
-    winloss_service.update_session_results(bob_session)
+        # --- UC2: Initialize stake ---
+        stake_service.initialize_stake(alice_id, alice_session, 1000, upper_limit=2000, lower_limit=200)
+        stake_service.initialize_stake(bob_id, bob_session, 1500, upper_limit=3000, lower_limit=300)
 
-    print("Alice streaks:", winloss_service.track_streaks(alice_session))
-    print("Bob streaks:", winloss_service.track_streaks(bob_session))
+        # --- UC3: Run bets ---
+        bet_service.fixed_strategy(session_id=alice_session, base_amount=50, num_bets=3, probability=0.5)
+        bet_service.martingale_strategy(session_id=bob_session, base_amount=20, num_bets=3, probability=0.5)
 
-    # End sessions
-    session_service.end_session(alice_session)
-    session_service.end_session(bob_session)
+        # --- UC5: Calculate results ---
+        winloss_service.update_session_results(alice_session)
+        winloss_service.update_session_results(bob_session)
 
-    # Show summaries
-    print("Alice summary:", session_service.get_session_summary(alice_session))
-    print("Bob summary:", session_service.get_session_summary(bob_session))
+        print("Alice streaks:", winloss_service.track_streaks(alice_session))
+        print("Bob streaks:", winloss_service.track_streaks(bob_session))
+
+        # End sessions
+        session_service.end_session(alice_session)
+        session_service.end_session(bob_session)
+
+        # Show summaries
+        print("Alice summary:", session_service.get_session_summary(alice_session))
+        print("Bob summary:", session_service.get_session_summary(bob_session))
+
+    except ValidationException as e:
+        print(f"Input validation failed: {e.message}")
 
 if __name__ == "__main__":
     main()
-

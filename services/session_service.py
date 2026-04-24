@@ -20,7 +20,7 @@ class SessionService:
             cursor.execute(query, values)
             self.connection.commit()
             session_id = cursor.lastrowid
-            print(f"✅ Session {session_id} started for gambler {gambler_id}")
+            print(f"Session {session_id} started for gambler {gambler_id}")
             return session_id
         except Error as e:
             print(f"Error starting session: {e}")
@@ -33,7 +33,7 @@ class SessionService:
             query = "UPDATE session SET status = %s WHERE session_id = %s"
             cursor.execute(query, ("PAUSED", session_id))
             self.connection.commit()
-            print(f"⏸️ Session {session_id} paused ({reason})")
+            print(f"Session {session_id} paused ({reason})")
         except Error as e:
             print(f"Error pausing session: {e}")
 
@@ -44,7 +44,7 @@ class SessionService:
             query = "UPDATE session SET status = %s WHERE session_id = %s"
             cursor.execute(query, ("ACTIVE", session_id))
             self.connection.commit()
-            print(f"▶️ Session {session_id} resumed")
+            print(f"Session {session_id} resumed")
         except Error as e:
             print(f"Error resuming session: {e}")
 
@@ -56,7 +56,7 @@ class SessionService:
             cursor.execute("SELECT initial_balance, gambler_id, upper_limit, lower_limit FROM session WHERE session_id = %s", (session_id,))
             session = cursor.fetchone()
             if not session:
-                print("❌ Session not found")
+                print("Session not found")
                 return
 
             # Determine end reason
@@ -77,7 +77,7 @@ class SessionService:
             """
             cursor.execute(query, (status, datetime.now(), balance, session_id))
             self.connection.commit()
-            print(f"✅ Session {session_id} ended ({reason}), final balance = {balance}")
+            print(f"Session {session_id} ended ({reason}), final balance = {balance}")
         except Error as e:
             print(f"Error ending session: {e}")
 
