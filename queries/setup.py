@@ -104,7 +104,7 @@ def create_tables():
         gambler_id INT,
         session_id INT,
         bet_id INT NULL,
-        type ENUM('BET_PLACED','WIN','LOSS','DEPOSIT','RESET') NOT NULL,
+        type ENUM('INITIAL_STAKE','BET_PLACED','WIN','LOSS','DEPOSIT','WITHDRAWAL','RESET') NOT NULL,
         amount DECIMAL(10,2),
         balance_after DECIMAL(10,2),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -125,5 +125,36 @@ def create_tables():
     cursor.close()
     connection.close()
 
+
+def seed_strategies():
+    """Insert default betting strategies into the strategy table"""
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    strategies = [
+        ("Fixed", "Bet a fixed amount every round"),
+        ("Percentage", "Bet a percentage of current stake"),
+        ("Martingale", "Double bet after each loss, reset after win"),
+    ]
+
+    try:
+        for name, description in strategies:
+            # Check if strategy already exists
+            cursor.execute("SELECT COUNT(*) FROM strategy WHERE name = %s", (name,))
+            if cursor.fetchone()[0] == 0:
+                cursor.execute(
+                    "INSERT INTO strategy (name, description) VALUES (%s, %s)",
+                    (name, description)
+                )
+        connection.commit()
+        print("✅ Default strategies seeded successfully")
+    except Error as e:
+        print(f"Error seeding strategies: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+
+
 if __name__ == "__main__":
     create_tables()
+    seed_strategies()
