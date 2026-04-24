@@ -4,6 +4,33 @@ from mysql.connector import Error
 from db.db import create_connection
 
 
+def drop_tables():
+    """Drop all tables in the correct order (reverse of foreign key dependencies)"""
+    connection = create_connection()
+    cursor = connection.cursor()
+    
+    tables_to_drop = [
+        "bet_history",
+        "stake_transaction",
+        "bet",
+        "session",
+        "betting_preferences",
+        "strategy",
+        "gambler"
+    ]
+    
+    try:
+        for table in tables_to_drop:
+            cursor.execute(f"DROP TABLE IF EXISTS {table}")
+        connection.commit()
+        print("✅ All tables dropped successfully")
+    except Error as e:
+        print(f"Error dropping tables: {e}")
+    finally:
+        cursor.close()
+        connection.close()
+
+
 def create_tables():
     connection = create_connection()
     cursor = connection.cursor()
@@ -77,6 +104,7 @@ def create_tables():
         bet_number INT,
         probability FLOAT,
         strategy_applied VARCHAR(50),
+        outcome ENUM('WIN','LOSS') NOT NULL,
         stake_before DECIMAL(10,2),
         stake_after DECIMAL(10,2),
         placed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -156,5 +184,6 @@ def seed_strategies():
 
 
 if __name__ == "__main__":
+    drop_tables()
     create_tables()
     seed_strategies()

@@ -22,10 +22,10 @@ class BetService:
 
             # Insert bet record
             query = """
-            INSERT INTO bet (session_id, bet_amount, bet_number, probability, strategy_applied, stake_before, stake_after)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO bet (session_id, bet_amount, bet_number, probability, strategy_applied, outcome, stake_before, stake_after)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """
-            values = (session_id, bet_amount, bet_number, probability, strategy_applied, stake_before, stake_after)
+            values = (session_id, bet_amount, bet_number, probability, strategy_applied, outcome, stake_before, stake_after)
             cursor.execute(query, values)
             self.connection.commit()
             bet_id = cursor.lastrowid
