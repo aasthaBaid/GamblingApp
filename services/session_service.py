@@ -43,17 +43,17 @@ class SessionService:
             # Check if session exists and is ACTIVE
             status = self.get_session_status(session_id)
             if status is None:
-                print(f"❌ Session {session_id} not found")
+                print(f"Session {session_id} not found")
                 return False
             elif status != "ACTIVE":
-                print(f"❌ Cannot pause session {session_id}: session is {status}, not ACTIVE")
+                print(f"Cannot pause session {session_id}: session is {status}, not ACTIVE")
                 return False
 
             cursor = self.connection.cursor()
             query = "UPDATE session SET status = %s WHERE session_id = %s"
             cursor.execute(query, ("PAUSED", session_id))
             self.connection.commit()
-            print(f"⏸️ Session {session_id} paused ({reason})")
+            print(f"Session {session_id} paused ({reason})")
             return True
         except Error as e:
             print(f"Error pausing session: {e}")

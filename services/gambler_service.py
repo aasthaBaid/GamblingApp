@@ -7,7 +7,7 @@ class GamblerService:
     def __init__(self):
         self.connection = create_connection()
 
-    # --- Gambler Profile Methods ---
+    #  Gambler Profile Methods 
     def create_gambler(self, name, initial_balance, min_balance, win_threshold, loss_threshold):
         try:
             cursor = self.connection.cursor()

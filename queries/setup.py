@@ -23,7 +23,7 @@ def drop_tables():
         for table in tables_to_drop:
             cursor.execute(f"DROP TABLE IF EXISTS {table}")
         connection.commit()
-        print("✅ All tables dropped successfully")
+        print("All tables dropped successfully")
     except Error as e:
         print(f"Error dropping tables: {e}")
     finally:
